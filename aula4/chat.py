@@ -5,15 +5,23 @@ def main(pagina): # definindo uma funcao
 
     tituloPopup = ft.Text("Bem-vindo(a)")
     nomeUsuario = ft.TextField(label="Digite seu nome")
-    mensagem = ft.TextField(label="Digite sua mensagem")
+
+    def enviarMensagemTunel(msg):
+        chat.controls.append(ft.Text(msg))
+        pagina.update()
+
+    pagina.pubsub.subscribe(enviarMensagemTunel) # cria a comunicacao entre tds os usuarios
 
     def enviarMensagem(evento):
         texto = f"{nomeUsuario.value}: {mensagem.value}"
-        chat.controls.append(ft.Text(texto))
+
+        pagina.pubsub.send_all(texto) # enviar msg no tunel
+
         mensagem.value = ""
 
         pagina.update()
 
+    mensagem = ft.TextField(label="Digite sua mensagem", on_submit=enviarMensagem) # quando apertar enter tmb enviar msg
     botaoEnviar = ft.ElevatedButton("Enviar", on_click=enviarMensagem)
 
     linhaMensagem = ft.Row([mensagem, botaoEnviar]) # aparecer na mesma linha
@@ -31,7 +39,7 @@ def main(pagina): # definindo uma funcao
 
         # notificar que entrou um usuario
         notificacao = f"{nomeUsuario.value} entrou no chat" #valor dinamico = f"{valorDinamico} awdaowhd texto"
-        chat.controls.append(ft.Text (notificacao)) # adicionar item na lista (coluna ded mensagens)
+        pagina.pubsub.send_all(notificacao)
 
         pagina.update()
 
